@@ -4,6 +4,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const userModel = require("./models/userModel");
+const foodModel = require("./models/foodModel");
+const verifyToken = require("./verifyToken");
 
 // Connect to MongoDB
 mongoose
@@ -88,6 +90,20 @@ app.post("/login", async (req, res) => {
   } catch (err) {
     // If an error occurs, send a 500 response with the error message
     res.status(500).send({ message: "Some Problem", error: err.message });
+  }
+});
+
+// GET endpoint to retrieve all foods
+app.get("/foods", verifyToken, async (req, res) => {
+  try {
+    // Attempt to find all food documents in the database
+    const foods = await foodModel.find();
+    // If successful, send the foods array in the response
+    res.send({ foods });
+  } catch (err) {
+    // If an error occurs, log the error and send a 500 status code with a message
+    console.error("Error fetching foods:", err);
+    res.status(500).send({ message: "Unable to retrieve items" });
   }
 });
 
