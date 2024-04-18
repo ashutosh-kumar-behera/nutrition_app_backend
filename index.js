@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose"); 
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const userModel = require("./models/userModel");
 
@@ -51,6 +52,45 @@ app.post("/register", async (req, res) => {
       .send({ message: "Something went wrong", error: err.message });
   }
 });
+
+// POST endpoint for user login
+app.post("/login", async (req, res) => {
+  // Extract email and password from request body
+  const { email, password } = req.body;
+
+  try {
+    // Attempt to find the user by email
+    const user = await userModel.findOne({ email });
+    // If user is not found, send a 404 response
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    // Compare the provided password with the stored hashed password
+    const isMatch = await bcrypt.compare(password, user.password);
+    // If the password doesn't match, send a 401 response
+    if (!isMatch) {
+      return res.status(401).send({ message: "Incorrect Password" });
+    }
+
+    // If the password matches, sign a new token with the user's email and a 1-hour expiration
+    const token = jwt.sign({ email }, "nutrifyApp", {
+      expiresIn: "1h",
+    });
+
+    // Send a success response with the login message, token, and user details
+    res.send({
+      message: "Login Success",
+      token,
+      userId: user._id,
+      name: user.name,
+    });
+  } catch (err) {
+    // If an error occurs, send a 500 response with the error message
+    res.status(500).send({ message: "Some Problem", error: err.message });
+  }
+});
+
 
 // Start the server on port 8000
 app.listen(8000, () => {
