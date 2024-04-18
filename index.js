@@ -107,6 +107,22 @@ app.get("/foods", verifyToken, async (req, res) => {
   }
 });
 
+// GET endpoint to retrieve a food item by name
+app.get("/foods/:name", verifyToken, async (req, res) => {
+  try {
+    // Use a regex search to find a food item that matches the name parameter, case-insensitive
+    const food = await foodModel.find({
+      name: { $regex: req.params.name, $options: "i" },
+    });
+
+    // If the food item is found, send it in the response
+    res.send({ food });
+  } catch (err) {
+    // If an error occurs, log the error and send a 500 status code with a message
+    console.error("Error fetching food item:", err);
+    res.status(500).send({ message: "Unable to retrieve the item" });
+  }
+});
 
 // Start the server on port 8000
 app.listen(8000, () => {
