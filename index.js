@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 
 const userModel = require("./models/userModel");
 const foodModel = require("./models/foodModel");
+const trackingModel = require("./models/trackingModel");
 const verifyToken = require("./verifyToken");
 
 // Connect to MongoDB
@@ -121,6 +122,25 @@ app.get("/foods/:name", verifyToken, async (req, res) => {
     // If an error occurs, log the error and send a 500 status code with a message
     console.error("Error fetching food item:", err);
     res.status(500).send({ message: "Unable to retrieve the item" });
+  }
+});
+
+// POST endpoint to track food consumption
+app.post("/track", verifyToken, async (req, res) => {
+  // Extract tracking data from the request body
+  let trackData = req.body;
+
+  try {
+    // Create a new tracking document in the database
+    const data = await trackingModel.create(trackData);
+    // If successful, send a 201 status code with a success message
+    res.status(201).send({ message: "Food Added" });
+  } catch (err) {
+    // If an error occurs, log the error and send a 500 status code with a message
+    console.error("Error adding food to tracking:", err);
+    res
+      .status(500)
+      .send({ message: "Some problem occurred while adding the food" });
   }
 });
 
