@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose"); 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const cors = require("cors");
 
 const userModel = require("./models/userModel");
 const foodModel = require("./models/foodModel");
@@ -24,6 +25,8 @@ mongoose
 const app = express();
 // Use express.json() middleware for parsing JSON bodies
 app.use(express.json());
+// Enable All CORS Requests for simplicity
+app.use(cors());
 
 // POST endpoint for user register
 app.post("/register", async (req, res) => {
