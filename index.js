@@ -144,6 +144,41 @@ app.post("/track", verifyToken, async (req, res) => {
   }
 });
 
+
+// Route to fetch all food consumed by a user on a specific date
+app.get('/track/:userId/:date', async (req, res) => {
+  const { userId, date } = req.params;
+  console.log(date);
+
+  // Convert the date from 'YYYY-MM-DD' format to a JavaScript Date object
+  const startDate = new Date(date);
+  startDate.setHours(0, 0, 0, 0); // Set to start of the day
+  console.log(startDate);
+  
+  const endDate = new Date(startDate);
+  endDate.setHours(23, 59, 59, 999); // Set to end of the day
+  console.log(endDate);
+
+  try {
+    // Find all food entries for the user on the specified date
+    const foodEntries = await trackingModel.find({
+      userId: userId,
+      eatenDate: {
+        $gte: startDate, // Greater than or equal to the start of the day
+        $lte: endDate    // Less than or equal to the end of the day
+      }
+    }).populate('foodId'); // Assuming you have a 'foodId' field to populate
+
+    // Send the food entries in the response
+    res.status(200).json(foodEntries);
+  } catch (err) {
+    // Handle any errors that occur during the database query
+    res.status(500).send({ message: "Error retrieving food entries", error: err.message });
+  }
+});
+
+
+
 // Start the server on port 8000
 app.listen(8000, () => {
   console.log("Server is running on port 8000");

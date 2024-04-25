@@ -1,26 +1,32 @@
 const mongoose = require("mongoose");
 
+// Define the schema for tracking food consumption
 const trackingSchema = new mongoose.Schema(
   {
-    userID: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "users",
+      ref: "users", // Assuming there is a User model with which to associate
       required: true,
     },
-    foodID: {
+    foodId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "foods",
+      ref: "foods", // Assuming there is a Food model with which to associate
       required: true,
     },
     quantity: {
       type: Number,
-      min: 1,
       required: true,
+      min: 1, // Minimum quantity set to 1
+    },
+    eatenDate: {
+      type: Date,
+      default: Date.now() // Set default to the current date and time
     },
   },
   { timestamps: true }
 );
 
-const trackingModel = mongoose.model("tracks", trackingSchema);
+// Create the model from the schema
+const trackingModel = mongoose.model("trackings", trackingSchema);
 
 module.exports = trackingModel;
