@@ -146,7 +146,7 @@ app.post("/track", verifyToken, async (req, res) => {
 
 
 // Route to fetch all food consumed by a user on a specific date
-app.get('/track/:userId/:date', async (req, res) => {
+app.get('/track/:userId/:date',verifyToken, async (req, res) => {
   const { userId, date } = req.params;
   console.log(date);
 
